@@ -1,21 +1,21 @@
 {
   "name": "mellstroy-casino",
-  "version": "1.0.0",
-  "description": "Mellstroy Casino - Real-time multiplayer online casino",
+  "version": "2.0.0",
+  "description": "Mellstroy Casino - Real-time multiplayer online casino with WebSocket",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"
   },
   "dependencies": {
-    "ws": "^8.16.0",
-    "express": "^4.18.2",
-    "uuid": "^9.0.0"
+    "express": "^4.21.0",
+    "ws": "^8.18.0",
+    "uuid": "^10.0.0"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.0.0"
   },
-  "keywords": ["casino", "websocket", "realtime"],
+  "keywords": ["casino", "websocket", "realtime", "mellstroy"],
   "author": "Mellstroy Casino",
   "license": "MIT"
 }

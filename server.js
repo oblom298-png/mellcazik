@@ -1,6 +1,8 @@
 /**
- * Mellstroy Casino - Real-time WebSocket Server
- * Handles: Chat, Live Wins Feed, Online Count, Nicknames
+ * Mellstroy Casino — Real-time WebSocket Server
+ * Optimized for Railway.app deployment
+ * 
+ * Handles: Registration, Chat, Live Wins, Online Count
  */
 
 const express = require('express');
@@ -8,22 +10,58 @@ const { WebSocketServer, WebSocket } = require('ws');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const http = require('http');
+const fs = require('fs');
+
+// ─── Express + HTTP Server ──────────────────────────────────────────────────
 
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocketServer({ server });
 
-// Serve static files
-app.use(express.static(path.join(__dirname)));
-app.use('/sounds', express.static(path.join(__dirname, 'sounds')));
+// ─── Static Files ───────────────────────────────────────────────────────────
+
+// Serve index.html and other root files
+app.use(express.static(path.join(__dirname), {
+  maxAge: '1h',
+  etag: true
+}));
+
+// Serve sounds folder (win.mp3 etc.)
+const soundsDir = path.join(__dirname, 'sounds');
+if (!fs.existsSync(soundsDir)) {
+  fs.mkdirSync(soundsDir, { recursive: true });
+  console.log('[FS] Created sounds/ directory');
+}
+app.use('/sounds', express.static(soundsDir, {
+  maxAge: '7d',
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.mp3')) {
+      res.setHeader('Content-Type', 'audio/mpeg');
+    }
+  }
+}));
+
 app.use(express.json());
 
-// In-memory store (resets on server restart)
-const clients = new Map(); // ws -> { id, nickname, joinedAt }
-const chatHistory = []; // last 50 messages
-const winHistory = []; // last 100 wins
+// ─── WebSocket Server ───────────────────────────────────────────────────────
+
+const wss = new WebSocketServer({ 
+  server,
+  perMessageDeflate: false,
+  maxPayload: 16 * 1024 // 16KB max message
+});
+
+// ─── In-Memory Store ────────────────────────────────────────────────────────
+
+const clients = new Map();    // ws -> { id, nickname, ip, joinedAt, registered }
+const chatHistory = [];       // last N chat messages
+const winHistory = [];        // last N win events
 const MAX_CHAT = 50;
 const MAX_WINS = 100;
+
+// Rate limiting per client
+const rateLimits = new Map(); // clientId -> { chatCount, lastReset }
+const RATE_LIMIT_WINDOW = 10000; // 10 seconds
+const RATE_LIMIT_MAX_CHAT = 8;   // max 8 messages per 10 seconds
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -31,7 +69,7 @@ function broadcast(data, excludeWs = null) {
   const msg = JSON.stringify(data);
   wss.clients.forEach(ws => {
     if (ws !== excludeWs && ws.readyState === WebSocket.OPEN) {
-      ws.send(msg);
+      try { ws.send(msg); } catch(e) {}
     }
   });
 }
@@ -42,12 +80,16 @@ function broadcastAll(data) {
 
 function sendTo(ws, data) {
   if (ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify(data));
+    try { ws.send(JSON.stringify(data)); } catch(e) {}
   }
 }
 
 function getOnlineCount() {
-  return [...wss.clients].filter(ws => ws.readyState === WebSocket.OPEN).length;
+  let count = 0;
+  wss.clients.forEach(ws => {
+    if (ws.readyState === WebSocket.OPEN) count++;
+  });
+  return count;
 }
 
 function broadcastOnlineCount() {
@@ -61,21 +103,26 @@ function sanitize(str) {
     .slice(0, 200)
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 function sanitizeNick(str) {
-  if (typeof str !== 'string') return 'Игрок';
+  if (typeof str !== 'string') return '';
   return str
     .trim()
     .slice(0, 24)
-    .replace(/[<>"'/\\]/g, '')
-    .replace(/\s+/g, ' ') || 'Игрок';
+    .replace(/[<>"'/\\`]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function isNicknameUsed(nick, excludeId = null) {
+  const lower = nick.toLowerCase();
   for (const [, client] of clients) {
-    if (client.id !== excludeId && client.nickname.toLowerCase() === nick.toLowerCase()) {
+    if (client.id !== excludeId && 
+        client.nickname && 
+        client.nickname.toLowerCase() === lower) {
       return true;
     }
   }
@@ -83,16 +130,33 @@ function isNicknameUsed(nick, excludeId = null) {
 }
 
 function formatTime() {
-  return new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+  return new Date().toLocaleTimeString('ru-RU', { 
+    hour: '2-digit', 
+    minute: '2-digit',
+    timeZone: 'Europe/Moscow'
+  });
 }
 
-// ─── WebSocket Connection ────────────────────────────────────────────────────
+function checkRateLimit(clientId) {
+  const now = Date.now();
+  let rl = rateLimits.get(clientId);
+  if (!rl || now - rl.lastReset > RATE_LIMIT_WINDOW) {
+    rl = { chatCount: 0, lastReset: now };
+    rateLimits.set(clientId, rl);
+  }
+  rl.chatCount++;
+  return rl.chatCount <= RATE_LIMIT_MAX_CHAT;
+}
+
+// ─── WebSocket Connection Handler ───────────────────────────────────────────
 
 wss.on('connection', (ws, req) => {
   const clientId = uuidv4();
-  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || 
+             req.headers['x-real-ip'] || 
+             req.socket.remoteAddress || 
+             'unknown';
 
-  // Register client (no nickname yet)
   clients.set(ws, {
     id: clientId,
     nickname: null,
@@ -101,7 +165,7 @@ wss.on('connection', (ws, req) => {
     registered: false
   });
 
-  console.log(`[+] Client connected: ${clientId} (${ip}), total: ${getOnlineCount()}`);
+  console.log(`[+] Connected: ${clientId} from ${ip} | Online: ${getOnlineCount()}`);
 
   // Send initial state
   sendTo(ws, {
@@ -114,12 +178,17 @@ wss.on('connection', (ws, req) => {
 
   broadcastOnlineCount();
 
-  // ─── Message Handler ───────────────────────────────────────────────────────
+  // ── Alive tracking ──
+  ws.isAlive = true;
+  ws.on('pong', () => { ws.isAlive = true; });
 
+  // ── Message Handler ──
   ws.on('message', (raw) => {
     let data;
     try {
-      data = JSON.parse(raw.toString());
+      const str = raw.toString();
+      if (str.length > 16384) return; // Drop oversized messages
+      data = JSON.parse(str);
     } catch {
       return;
     }
@@ -129,15 +198,16 @@ wss.on('connection', (ws, req) => {
 
     switch (data.type) {
 
-      // ── Registration ──────────────────────────────────────────────────────
+      // ═══ REGISTER ═══
       case 'register': {
         const nick = sanitizeNick(data.nickname || '');
-        if (!nick || nick.length < 2) {
-          sendTo(ws, { type: 'register_error', message: 'Никнейм слишком короткий (минимум 2 символа)' });
+        
+        if (nick.length < 2) {
+          sendTo(ws, { type: 'register_error', message: 'Минимум 2 символа' });
           return;
         }
         if (nick.length > 24) {
-          sendTo(ws, { type: 'register_error', message: 'Никнейм слишком длинный (максимум 24 символа)' });
+          sendTo(ws, { type: 'register_error', message: 'Максимум 24 символа' });
           return;
         }
         if (isNicknameUsed(nick, clientId)) {
@@ -145,16 +215,19 @@ wss.on('connection', (ws, req) => {
           return;
         }
 
+        // Check for bad words (basic)
+        const badWords = ['admin', 'moderator', 'система', 'system'];
+        if (badWords.some(w => nick.toLowerCase().includes(w))) {
+          sendTo(ws, { type: 'register_error', message: 'Этот никнейм запрещён' });
+          return;
+        }
+
         client.nickname = nick;
         client.registered = true;
 
-        sendTo(ws, {
-          type: 'register_ok',
-          nickname: nick,
-          clientId
-        });
+        sendTo(ws, { type: 'register_ok', nickname: nick, clientId });
 
-        // Announce join to everyone
+        // Announce
         const joinMsg = {
           type: 'system_message',
           text: `🎰 ${nick} присоединился к казино!`,
@@ -163,22 +236,27 @@ wss.on('connection', (ws, req) => {
         chatHistory.push(joinMsg);
         if (chatHistory.length > MAX_CHAT) chatHistory.shift();
         broadcastAll(joinMsg);
-
         broadcastOnlineCount();
-        console.log(`[✓] Registered: ${nick} (${clientId})`);
+
+        console.log(`[✓] Registered: "${nick}" (${clientId})`);
         break;
       }
 
-      // ── Chat Message ──────────────────────────────────────────────────────
+      // ═══ CHAT ═══
       case 'chat': {
         if (!client.registered || !client.nickname) {
           sendTo(ws, { type: 'error', message: 'Сначала зарегистрируйтесь' });
           return;
         }
 
+        // Rate limit
+        if (!checkRateLimit(client.id)) {
+          sendTo(ws, { type: 'error', message: 'Слишком много сообщений, подождите' });
+          return;
+        }
+
         const text = sanitize(data.text || '');
-        if (!text) return;
-        if (text.length > 200) return;
+        if (!text || text.length > 200) return;
 
         const msg = {
           type: 'chat',
@@ -191,12 +269,11 @@ wss.on('connection', (ws, req) => {
 
         chatHistory.push(msg);
         if (chatHistory.length > MAX_CHAT) chatHistory.shift();
-
         broadcastAll(msg);
         break;
       }
 
-      // ── Win Broadcast ─────────────────────────────────────────────────────
+      // ═══ WIN ═══
       case 'win': {
         if (!client.registered || !client.nickname) return;
 
@@ -217,11 +294,9 @@ wss.on('connection', (ws, req) => {
 
         winHistory.push(win);
         if (winHistory.length > MAX_WINS) winHistory.shift();
-
-        // Broadcast win to all (for ticker + chat notification)
         broadcastAll(win);
 
-        // Big win system message in chat
+        // Big win announcement
         if (amount >= 500) {
           const sysMsg = {
             type: 'system_message',
@@ -232,11 +307,10 @@ wss.on('connection', (ws, req) => {
           if (chatHistory.length > MAX_CHAT) chatHistory.shift();
           broadcastAll(sysMsg);
         }
-
         break;
       }
 
-      // ── Ping ──────────────────────────────────────────────────────────────
+      // ═══ PING ═══
       case 'ping': {
         sendTo(ws, { type: 'pong', time: Date.now() });
         break;
@@ -247,8 +321,7 @@ wss.on('connection', (ws, req) => {
     }
   });
 
-  // ─── Disconnect ────────────────────────────────────────────────────────────
-
+  // ── Disconnect ──
   ws.on('close', () => {
     const client = clients.get(ws);
     if (client) {
@@ -262,77 +335,134 @@ wss.on('connection', (ws, req) => {
         if (chatHistory.length > MAX_CHAT) chatHistory.shift();
         broadcast(leaveMsg, ws);
       }
+      rateLimits.delete(client.id);
       clients.delete(ws);
     }
-    console.log(`[-] Client disconnected: ${client?.id || '?'}, total: ${getOnlineCount()}`);
+    console.log(`[-] Disconnected: ${client?.id || '?'} | Online: ${getOnlineCount()}`);
     broadcastOnlineCount();
   });
 
   ws.on('error', (err) => {
-    console.error('[WS Error]', err.message);
+    console.error(`[WS Error] ${err.message}`);
   });
 });
 
-// ─── REST Endpoints ──────────────────────────────────────────────────────────
+// ─── REST Endpoints ─────────────────────────────────────────────────────────
 
-// Health check
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     online: getOnlineCount(),
-    uptime: process.uptime(),
+    uptime: Math.floor(process.uptime()),
+    memory: Math.floor(process.memoryUsage().heapUsed / 1024 / 1024) + 'MB',
     wins: winHistory.length,
     chats: chatHistory.length
   });
 });
 
-// Get recent wins
 app.get('/api/wins', (req, res) => {
   res.json(winHistory.slice(-20));
 });
 
-// Get online count
 app.get('/api/online', (req, res) => {
   res.json({ count: getOnlineCount() });
 });
 
-// ─── Periodic cleanup & keepalive ────────────────────────────────────────────
+// Fallback — serve index.html for any unknown route (SPA style)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
 
-// Ping all clients every 30 seconds to keep connections alive
-setInterval(() => {
+// ─── Keepalive & Cleanup ────────────────────────────────────────────────────
+
+// Ping all clients every 25 seconds (Railway closes idle connections at 30s)
+const PING_INTERVAL = setInterval(() => {
   wss.clients.forEach(ws => {
-    if (ws.readyState === WebSocket.OPEN) {
-      ws.ping();
+    if (!ws.isAlive) {
+      ws.terminate();
+      return;
     }
+    ws.isAlive = false;
+    ws.ping();
   });
-}, 30000);
+}, 25000);
 
 // Broadcast online count every 10 seconds
-setInterval(() => {
+const COUNT_INTERVAL = setInterval(() => {
   broadcastOnlineCount();
 }, 10000);
 
-// ─── Start Server ─────────────────────────────────────────────────────────────
+// Clean up rate limits every minute
+const CLEANUP_INTERVAL = setInterval(() => {
+  const now = Date.now();
+  for (const [id, rl] of rateLimits) {
+    if (now - rl.lastReset > RATE_LIMIT_WINDOW * 3) {
+      rateLimits.delete(id);
+    }
+  }
+}, 60000);
 
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
+// ─── Start Server ───────────────────────────────────────────────────────────
+
+const PORT = parseInt(process.env.PORT, 10) || 3000;
+const HOST = '0.0.0.0'; // Railway requires binding to 0.0.0.0
+
+server.listen(PORT, HOST, () => {
   console.log(`
-╔══════════════════════════════════════════╗
-║   🎰  MELLSTROY CASINO SERVER  🎰        ║
-║   Порт: ${PORT}                               ║
-║   Статус: Запущен                        ║
-║   WebSocket: ws://localhost:${PORT}           ║
-║   HTTP:      http://localhost:${PORT}         ║
-╚══════════════════════════════════════════╝
+╔═══════════════════════════════════════════════╗
+║   🎰  MELLSTROY CASINO SERVER  🎰             ║
+║                                               ║
+║   Host:      ${HOST}                          ║
+║   Port:      ${PORT}                              ║
+║   Status:    ✅ Running                        ║
+║   Node:      ${process.version}                       ║
+║   PID:       ${process.pid}                           ║
+║                                               ║
+║   HTTP:      http://localhost:${PORT}              ║
+║   Health:    http://localhost:${PORT}/health        ║
+║                                               ║
+║   📂 sounds/ folder ready for win.mp3         ║
+╚═══════════════════════════════════════════════╝
   `);
 });
 
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received, closing server...');
-  server.close(() => process.exit(0));
+// ─── Graceful Shutdown ──────────────────────────────────────────────────────
+
+function shutdown(signal) {
+  console.log(`\n[${signal}] Shutting down gracefully...`);
+  
+  clearInterval(PING_INTERVAL);
+  clearInterval(COUNT_INTERVAL);
+  clearInterval(CLEANUP_INTERVAL);
+  
+  // Close all WebSocket connections
+  wss.clients.forEach(ws => {
+    try {
+      ws.close(1001, 'Server shutting down');
+    } catch(e) {}
+  });
+  
+  wss.close(() => {
+    server.close(() => {
+      console.log('[✓] Server stopped cleanly');
+      process.exit(0);
+    });
+  });
+  
+  // Force exit after 5 seconds
+  setTimeout(() => {
+    console.log('[!] Forcing exit...');
+    process.exit(1);
+  }, 5000);
+}
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
+
+// Prevent crash on unhandled errors
+process.on('uncaughtException', (err) => {
+  console.error('[FATAL] Uncaught exception:', err.message);
 });
-process.on('SIGINT', () => {
-  console.log('SIGINT received, closing server...');
-  server.close(() => process.exit(0));
+process.on('unhandledRejection', (err) => {
+  console.error('[FATAL] Unhandled rejection:', err);
 });
