@@ -712,16 +712,17 @@ html, body { max-width: 100vw; overflow-x: hidden; }
       <div class="nav-item" data-page="slots" onclick="Nav.go('slots')"><span class="nav-icon">🎰</span>Слоты</div>
       <div class="nav-item" data-page="blackjack" onclick="Nav.go('blackjack')"><span class="nav-icon">🃏</span>Блэкджек</div>
       <div class="nav-item" data-page="roulette" onclick="Nav.go('roulette')"><span class="nav-icon">🎡</span>Рулетка</div>
-      <div class="nav-item" data-page="videopoker" onclick="Nav.go('videopoker')"><span class="nav-icon">🂡</span>Видео Покер</div>
+      <div class="nav-item" data-page="coinflip" onclick="Nav.go('coinflip')"><span class="nav-icon">🪙</span>Монетка<span class="nav-badge">NEW</span></div>
     </div>
     <div class="nav-section">
       <div class="nav-section-title">🎲 Другие</div>
+      <div class="nav-item" data-page="limbo" onclick="Nav.go('limbo')"><span class="nav-icon">🎯</span>Лимбо<span class="nav-hot">HOT</span></div>
+      <div class="nav-item" data-page="hilo" onclick="Nav.go('hilo')"><span class="nav-icon">⬆️</span>Hi-Lo<span class="nav-badge">NEW</span></div>
       <div class="nav-item" data-page="craps" onclick="Nav.go('craps')"><span class="nav-icon">🎲</span>Крэпс</div>
       <div class="nav-item" data-page="baccarat" onclick="Nav.go('baccarat')"><span class="nav-icon">🎴</span>Баккара</div>
       <div class="nav-item" data-page="fortune" onclick="Nav.go('fortune')"><span class="nav-icon">🎡</span>Колесо</div>
       <div class="nav-item" data-page="scratch" onclick="Nav.go('scratch')"><span class="nav-icon">🎫</span>Скретч</div>
       <div class="nav-item" data-page="dragontiger" onclick="Nav.go('dragontiger')"><span class="nav-icon">🐉</span>Дракон-Тигр</div>
-      <div class="nav-item" data-page="keno" onclick="Nav.go('keno')"><span class="nav-icon">🔢</span>Кено</div>
     </div>
   </div>
   <div class="online-bar">
@@ -732,7 +733,7 @@ html, body { max-width: 100vw; overflow-x: hidden; }
   <div class="sidebar-footer">
     <button onclick="Modals.show('modal-stats')">📊 Стат</button>
     <button onclick="Modals.show('modal-ach')">🏆 Призы</button>
-    <button onclick="Modals.show('modal-hist')">📜 История</button>
+    <button onclick="Modals.show('modal-pass')">🎫 Пасс</button>
     <button onclick="Modals.show('modal-quests')">🎯 Задания</button>
   </div>
 </nav>
@@ -758,7 +759,7 @@ html, body { max-width: 100vw; overflow-x: hidden; }
       <div class="user-name" id="user-name-display">Гость</div>
     </div>
     <div class="balance-box" id="balance-box">
-      <span class="balance-icon">💎</span>
+      <img src="https://w7.pngwing.com/pngs/91/889/png-transparent-rubel-coin-rubel-world-currency-coin-world-currency-coin-gold-coin-3d-icon.png" alt="coin" style="width:20px;height:20px;border-radius:50%;flex-shrink:0;">
       <span class="balance-val" id="bal">$10,000</span>
     </div>
     <button class="btn btn-gold btn-sm" onclick="GS.dailyBonus()">🎁</button>
@@ -817,13 +818,14 @@ html, body { max-width: 100vw; overflow-x: hidden; }
     <div class="game-card" onclick="Nav.go('slots')"><div class="game-card-img gi-slots">🎰<span class="game-tag tag-vip">VIP</span></div><div class="game-card-body"><div class="game-card-name">Слоты</div><div class="game-card-desc">5 барабанов, 3 линии</div><div class="game-card-rtp">RTP 95%</div></div></div>
     <div class="game-card" onclick="Nav.go('blackjack')"><div class="game-card-img gi-bj">🃏</div><div class="game-card-body"><div class="game-card-name">Блэкджек</div><div class="game-card-desc">Классический 21</div><div class="game-card-rtp">RTP 99.5%</div></div></div>
     <div class="game-card" onclick="Nav.go('roulette')"><div class="game-card-img gi-roul">🎡</div><div class="game-card-body"><div class="game-card-name">Рулетка</div><div class="game-card-desc">Европейская</div><div class="game-card-rtp">RTP 97.3%</div></div></div>
-    <div class="game-card" onclick="Nav.go('videopoker')"><div class="game-card-img gi-poker">🂡</div><div class="game-card-body"><div class="game-card-name">Видео Покер</div><div class="game-card-desc">Jacks or Better</div><div class="game-card-rtp">RTP 99.5%</div></div></div>
+    <div class="game-card" onclick="Nav.go('coinflip')"><div class="game-card-img gi-fortune">🪙<span class="game-tag tag-new">NEW</span></div><div class="game-card-body"><div class="game-card-name">Монетка</div><div class="game-card-desc">Орёл или решка</div><div class="game-card-rtp">RTP 98%</div></div></div>
+    <div class="game-card" onclick="Nav.go('limbo')"><div class="game-card-img gi-dice">🎯<span class="game-tag tag-hot">HOT</span></div><div class="game-card-body"><div class="game-card-name">Лимбо</div><div class="game-card-desc">Угадай множитель</div><div class="game-card-rtp">RTP 97%</div></div></div>
+    <div class="game-card" onclick="Nav.go('hilo')"><div class="game-card-img gi-plinko">⬆️<span class="game-tag tag-new">NEW</span></div><div class="game-card-body"><div class="game-card-name">Hi-Lo</div><div class="game-card-desc">Выше или ниже</div><div class="game-card-rtp">RTP 97%</div></div></div>
     <div class="game-card" onclick="Nav.go('craps')"><div class="game-card-img gi-craps">🎲</div><div class="game-card-body"><div class="game-card-name">Крэпс</div><div class="game-card-desc">Бросай кости</div><div class="game-card-rtp">RTP 98.6%</div></div></div>
     <div class="game-card" onclick="Nav.go('baccarat')"><div class="game-card-img gi-bacc">🎴</div><div class="game-card-body"><div class="game-card-name">Баккара</div><div class="game-card-desc">Player vs Banker</div><div class="game-card-rtp">RTP 98.9%</div></div></div>
     <div class="game-card" onclick="Nav.go('fortune')"><div class="game-card-img gi-fortune">🎡</div><div class="game-card-body"><div class="game-card-name">Колесо Фортуны</div><div class="game-card-desc">Крути и выигрывай</div><div class="game-card-rtp">RTP 94%</div></div></div>
     <div class="game-card" onclick="Nav.go('scratch')"><div class="game-card-img gi-scratch">🎫</div><div class="game-card-body"><div class="game-card-name">Скретч Карты</div><div class="game-card-desc">Стирай и выигрывай</div><div class="game-card-rtp">RTP 92%</div></div></div>
     <div class="game-card" onclick="Nav.go('dragontiger')"><div class="game-card-img gi-dt">🐉</div><div class="game-card-body"><div class="game-card-name">Дракон и Тигр</div><div class="game-card-desc">Быстрая дуэль</div><div class="game-card-rtp">RTP 96.3%</div></div></div>
-    <div class="game-card" onclick="Nav.go('keno')"><div class="game-card-img gi-keno">🔢</div><div class="game-card-body"><div class="game-card-name">Кено</div><div class="game-card-desc">Выбери числа</div><div class="game-card-rtp">RTP 95%</div></div></div>
   </div>
 </div>
 
@@ -1088,18 +1090,59 @@ html, body { max-width: 100vw; overflow-x: hidden; }
   </div>
 </div>
 
-<!-- ══ KENO ══ -->
-<div class="page" id="page-keno">
-  <div class="game-page-header"><button class="btn btn-outline btn-sm" onclick="Nav.go('home')">← Назад</button><h2>🔢 Кено</h2></div>
+<!-- ══ COINFLIP ══ -->
+<div class="page" id="page-coinflip">
+  <div class="game-page-header"><button class="btn btn-outline btn-sm" onclick="Nav.go('home')">← Назад</button><h2>🪙 Монетка</h2></div>
   <div class="game-wrapper text-center">
-    <div class="text-sm text-gray mb-12" id="keno-info">Выберите от 1 до 10 чисел</div>
-    <div class="keno-board" id="keno-board"></div>
-    <div id="keno-result" class="result-display"></div>
-    <div class="bet-row"><div class="bet-input-group"><button onclick="Keno.adj(-1)">−</button><input type="number" id="keno-bet" value="5" min="1"><button onclick="Keno.adj(1)">+</button></div></div>
-    <div class="flex-center">
-      <button class="btn btn-green" id="keno-play" onclick="Keno.play()">ИГРАТЬ</button>
-      <button class="btn btn-red btn-sm" onclick="Keno.clear()">СБРОС</button>
+    <div id="coin-display" style="font-size:6em;margin:20px 0;transition:transform 0.6s ease;">🪙</div>
+    <div id="coinflip-result" class="result-display"></div>
+    <div class="bet-row"><div class="bet-input-group"><button onclick="Coinflip.adj(-5)">−</button><input type="number" id="coin-bet" value="10" min="1"><button onclick="Coinflip.adj(5)">+</button></div></div>
+    <div class="flex-center mt-8">
+      <button class="btn btn-gold btn-lg" onclick="Coinflip.play('heads')" id="coin-heads" style="min-width:120px;">🦅 ОРЁЛ</button>
+      <button class="btn btn-accent btn-lg" onclick="Coinflip.play('tails')" id="coin-tails" style="min-width:120px;">🌿 РЕШКА</button>
     </div>
+    <div class="info-box mt-12 text-center"><span class="text-gray text-sm">Выигрыш x1.96 · Выберите сторону монеты</span></div>
+  </div>
+</div>
+
+<!-- ══ LIMBO ══ -->
+<div class="page" id="page-limbo">
+  <div class="game-page-header"><button class="btn btn-outline btn-sm" onclick="Nav.go('home')">← Назад</button><h2>🎯 Лимбо</h2></div>
+  <div class="game-wrapper text-center">
+    <div id="limbo-display" style="font-size:4em;font-weight:900;margin:20px 0;color:var(--gray);">—</div>
+    <div class="bet-row">
+      <span class="text-sm text-gray">Цель (x):</span>
+      <div class="bet-input-group"><button onclick="Limbo.adjTarget(-0.5)">−</button><input type="number" id="limbo-target" value="2" min="1.01" step="0.1" style="width:65px" oninput="Limbo.updateChance()"><button onclick="Limbo.adjTarget(0.5)">+</button></div>
+    </div>
+    <div class="dice-stats">
+      <div><span class="text-gray text-sm">Множитель</span><br><strong class="text-gold" id="limbo-payout">x2.00</strong></div>
+      <div><span class="text-gray text-sm">Шанс</span><br><strong class="text-green" id="limbo-chance">49.50%</strong></div>
+    </div>
+    <div class="bet-row"><div class="bet-input-group"><button onclick="Limbo.adj(-5)">−</button><input type="number" id="limbo-bet" value="10" min="1"><button onclick="Limbo.adj(5)">+</button></div></div>
+    <div id="limbo-result" class="result-display"></div>
+    <button class="btn btn-green btn-lg mt-8" onclick="Limbo.play()" style="min-width:160px;">🎯 ИГРАТЬ</button>
+    <div class="info-box mt-12 text-center"><span class="text-gray text-sm">Установите целевой множитель. Если выпавший множитель >= цели — вы выиграли!</span></div>
+  </div>
+</div>
+
+<!-- ══ HI-LO ══ -->
+<div class="page" id="page-hilo">
+  <div class="game-page-header"><button class="btn btn-outline btn-sm" onclick="Nav.go('home')">← Назад</button><h2>⬆️ Hi-Lo</h2></div>
+  <div class="game-wrapper text-center">
+    <div style="margin:10px 0;">
+      <div class="text-sm text-gray mb-12">Текущая карта:</div>
+      <div id="hilo-card" style="display:inline-block;"></div>
+      <div class="text-sm text-gold font-bold mt-8" id="hilo-streak-display">Серия: 0 · Множитель: x1.00</div>
+    </div>
+    <div id="hilo-result" class="result-display"></div>
+    <div class="bet-row"><div class="bet-input-group"><button onclick="HiLo.adj(-5)">−</button><input type="number" id="hilo-bet" value="10" min="1"><button onclick="HiLo.adj(5)">+</button></div></div>
+    <div class="flex-center mt-8">
+      <button class="btn btn-green btn-lg" onclick="HiLo.guess('hi')" id="hilo-hi" disabled>⬆️ ВЫШЕ</button>
+      <button class="btn btn-accent" onclick="HiLo.cashout()" id="hilo-cashout" disabled>💰 ЗАБРАТЬ</button>
+      <button class="btn btn-red btn-lg" onclick="HiLo.guess('lo')" id="hilo-lo" disabled>⬇️ НИЖЕ</button>
+    </div>
+    <button class="btn btn-gold mt-8" onclick="HiLo.start()" id="hilo-start">🃏 НАЧАТЬ ИГРУ</button>
+    <div class="info-box mt-12 text-center"><span class="text-gray text-sm">Угадайте, следующая карта будет выше или ниже текущей. Каждое верное угадывание увеличивает множитель!</span></div>
   </div>
 </div>
 
@@ -1148,6 +1191,16 @@ html, body { max-width: 100vw; overflow-x: hidden; }
     <h2>🎯 Ежедневные задания</h2>
     <p class="text-gray text-sm mb-12">Задания обновляются каждый день в 00:00 по серверу. Выполняйте их и получайте бонусы.</p>
     <div id="quests-body"></div>
+  </div>
+</div>
+
+<!-- CASINO PASS MODAL -->
+<div class="modal-overlay" id="modal-pass">
+  <div class="modal">
+    <button class="modal-close" onclick="Modals.close('modal-pass')">✕</button>
+    <h2>🎫 Casino Pass</h2>
+    <p class="text-gray text-sm mb-12">Зарабатывайте XP за игру и получайте награды за каждый уровень пропуска!</p>
+    <div id="pass-body"></div>
   </div>
 </div>
 
@@ -1776,20 +1829,10 @@ const Nav = {
   cur: 'home',
   // All games accessible from level 1 — level system is for XP/progression only, not gating
   levelLocks: {
-    crash: 1,
-    mines: 1,
-    plinko: 1,
-    dice: 1,
-    slots: 1,
-    blackjack: 1,
-    roulette: 1,
-    videopoker: 1,
-    craps: 1,
-    baccarat: 1,
-    fortune: 1,
-    scratch: 1,
-    dragontiger: 1,
-    keno: 1
+    crash: 1, mines: 1, plinko: 1, dice: 1, slots: 1,
+    blackjack: 1, roulette: 1, coinflip: 1, limbo: 1, hilo: 1,
+    craps: 1, baccarat: 1, fortune: 1, scratch: 1, dragontiger: 1,
+    videopoker: 1
   },
 
   go(id) {
@@ -1807,9 +1850,9 @@ const Nav = {
     this.closeSidebar();
     const inits = {
       roulette: () => Roulette.init(), fortune: () => Fortune.init(),
-      keno: () => Keno.init(), slots: () => Slots.init(),
-      videopoker: () => VP.init(), plinko: () => Plinko.init(),
-      crash: () => Crash.init(), mines: () => Mines.initGrid()
+      slots: () => Slots.init(), videopoker: () => VP.init(),
+      plinko: () => Plinko.init(), crash: () => Crash.init(),
+      mines: () => Mines.initGrid()
     };
     if (inits[id]) inits[id]();
     window.scrollTo(0, 0);
@@ -2084,11 +2127,23 @@ const Crash = {
 
   cashOut() {
     this.cashedOut = true;
+    // Stop animation immediately
+    if (this.anim) { cancelAnimationFrame(this.anim); this.anim = null; }
     const w = Math.floor(this.bet * this.mult);
     GS.win(w, 'Краш');
     $('crash-result').innerHTML = `<span class="win-text">Забрал ${this.mult.toFixed(2)}x — $${fmt(w)}! 🎉</span>`;
     SFX.play(w > this.bet * 5 ? 'bigwin' : 'win');
-    $('crash-btn').disabled = true;
+    // Add to history and reset
+    this.history.unshift(this.mult);
+    if (this.history.length > 15) this.history.pop();
+    $('crash-history').innerHTML = this.history.map(h =>
+      `<span class="ch-item ${h >= 2 ? 'ch-green' : 'ch-red'}">${h.toFixed(2)}x</span>`
+    ).join('');
+    $('crash-mult').className = 'crash-multiplier flying';
+    $('crash-btn').textContent = '🚀 СТАВКА';
+    $('crash-btn').className = 'btn btn-green btn-lg';
+    $('crash-btn').disabled = false;
+    this.state = 'idle';
   },
 
   animate() {
@@ -3407,6 +3462,247 @@ const Keno = {
     this.picked.clear();
     document.querySelectorAll('.keno-num.picked').forEach(e => e.classList.remove('picked'));
     $('keno-info').textContent = 'Выберите от 1 до 10 чисел';
+  }
+};
+
+/* ══════════════════════════════════════════════════════
+   COINFLIP
+══════════════════════════════════════════════════════ */
+const Coinflip = {
+  adj(d) { $('coin-bet').value = Math.max(1, +$('coin-bet').value + d); },
+  play(side) {
+    const bet = +$('coin-bet').value;
+    if (!GS.bet(bet)) return;
+    $('coin-heads').disabled = $('coin-tails').disabled = true;
+    const result = Math.random() < 0.5 ? 'heads' : 'tails';
+    const coinEl = $('coin-display');
+    coinEl.style.transform = 'rotateY(720deg) scale(1.3)';
+    SFX.play('spin');
+    setTimeout(() => {
+      coinEl.style.transform = 'rotateY(0) scale(1)';
+      coinEl.textContent = result === 'heads' ? '🦅' : '🌿';
+      const lb = result === 'heads' ? 'Орёл' : 'Решка';
+      if (side === result) {
+        const w = Math.floor(bet * 1.96);
+        GS.win(w, 'Монетка');
+        $('coinflip-result').innerHTML = `<span class="win-text">${lb}! $${fmt(w)} 🎉</span>`;
+        SFX.play('win');
+      } else {
+        GS.lose('Монетка');
+        $('coinflip-result').innerHTML = `<span class="lose-text">${lb} — Проигрыш</span>`;
+        SFX.play('lose');
+      }
+      $('coin-heads').disabled = $('coin-tails').disabled = false;
+      setTimeout(() => { coinEl.textContent = '🪙'; }, 2000);
+    }, 600);
+  }
+};
+
+/* ══════════════════════════════════════════════════════
+   LIMBO
+══════════════════════════════════════════════════════ */
+const Limbo = {
+  adj(d) { $('limbo-bet').value = Math.max(1, +$('limbo-bet').value + d); },
+  adjTarget(d) {
+    const v = Math.max(1.01, +(+$('limbo-target').value + d).toFixed(2));
+    $('limbo-target').value = v;
+    this.updateChance();
+  },
+  updateChance() {
+    const t = Math.max(1.01, +$('limbo-target').value);
+    const chance = (99 / t).toFixed(2);
+    $('limbo-payout').textContent = 'x' + t.toFixed(2);
+    $('limbo-chance').textContent = chance + '%';
+  },
+  play() {
+    const bet = +$('limbo-bet').value;
+    const target = Math.max(1.01, +$('limbo-target').value);
+    if (!GS.bet(bet)) return;
+    SFX.play('spin');
+    // Generate result: house edge 1%
+    const r = Math.random();
+    const result = r < 0.01 ? 1.00 : Math.max(1.00, Math.floor(99 / (1 - r)) / 100);
+    const disp = $('limbo-display');
+    disp.textContent = result.toFixed(2) + 'x';
+    if (result >= target) {
+      disp.style.color = 'var(--green)';
+      const w = Math.floor(bet * target);
+      GS.win(w, 'Лимбо');
+      $('limbo-result').innerHTML = `<span class="win-text">${result.toFixed(2)}x >= ${target.toFixed(2)}x — $${fmt(w)}!</span>`;
+      SFX.play(target >= 5 ? 'bigwin' : 'win');
+    } else {
+      disp.style.color = 'var(--red)';
+      GS.lose('Лимбо');
+      $('limbo-result').innerHTML = `<span class="lose-text">${result.toFixed(2)}x < ${target.toFixed(2)}x — Проигрыш</span>`;
+      SFX.play('lose');
+    }
+    setTimeout(() => { disp.style.color = 'var(--gray)'; }, 1500);
+  }
+};
+
+/* ══════════════════════════════════════════════════════
+   HI-LO
+══════════════════════════════════════════════════════ */
+const HiLo = {
+  deck: [], curCard: null, streak: 0, bet: 0, playing: false,
+  adj(d) { $('hilo-bet').value = Math.max(1, +$('hilo-bet').value + d); },
+  cardVal(c) {
+    if (c.rank === 'A') return 1;
+    if ('JQK'.includes(c.rank)) return {J:11,Q:12,K:13}[c.rank];
+    return +c.rank;
+  },
+  getMult() { return Math.max(1, +(1 + this.streak * 0.45).toFixed(2)); },
+  start() {
+    const bet = +$('hilo-bet').value;
+    if (!GS.bet(bet)) return;
+    this.bet = bet;
+    this.deck = mkDeck();
+    this.curCard = this.deck.pop();
+    this.streak = 0;
+    this.playing = true;
+    $('hilo-card').innerHTML = renderCard(this.curCard);
+    $('hilo-hi').disabled = false; $('hilo-lo').disabled = false;
+    $('hilo-cashout').disabled = true;
+    $('hilo-start').disabled = true;
+    $('hilo-result').textContent = '';
+    this.updateDisplay();
+    SFX.play('deal');
+  },
+  updateDisplay() {
+    $('hilo-streak-display').textContent = `Серия: ${this.streak} · Множитель: x${this.getMult().toFixed(2)}`;
+  },
+  guess(dir) {
+    if (!this.playing || !this.deck.length) return;
+    const next = this.deck.pop();
+    const cv = this.cardVal(this.curCard), nv = this.cardVal(next);
+    $('hilo-card').innerHTML = renderCard(next);
+    SFX.play('deal');
+    const correct = (dir === 'hi' && nv >= cv) || (dir === 'lo' && nv <= cv);
+    if (correct) {
+      this.streak++;
+      this.curCard = next;
+      this.updateDisplay();
+      $('hilo-cashout').disabled = false;
+      $('hilo-result').innerHTML = `<span class="win-text">Верно! Серия: ${this.streak} (x${this.getMult().toFixed(2)})</span>`;
+      SFX.play('gem');
+      if (!this.deck.length) this.cashout();
+    } else {
+      this.playing = false;
+      $('hilo-hi').disabled = $('hilo-lo').disabled = $('hilo-cashout').disabled = true;
+      $('hilo-start').disabled = false;
+      $('hilo-result').innerHTML = `<span class="lose-text">Неверно! Проигрыш — серия ${this.streak}</span>`;
+      GS.lose('Hi-Lo');
+      SFX.play('lose');
+    }
+  },
+  cashout() {
+    if (!this.playing) return;
+    this.playing = false;
+    const m = this.getMult();
+    const w = Math.floor(this.bet * m);
+    GS.win(w, 'Hi-Lo');
+    $('hilo-result').innerHTML = `<span class="win-text">Забрал x${m.toFixed(2)} — $${fmt(w)}! 🎉</span>`;
+    SFX.play(m >= 3 ? 'bigwin' : 'win');
+    $('hilo-hi').disabled = $('hilo-lo').disabled = $('hilo-cashout').disabled = true;
+    $('hilo-start').disabled = false;
+  }
+};
+
+/* ══════════════════════════════════════════════════════
+   CASINO PASS (20 levels)
+══════════════════════════════════════════════════════ */
+const CasinoPass = {
+  rewards: [
+    {lvl:1, xp:0, prize:'Стартовый бонус', money:500, bonusXP:0},
+    {lvl:2, xp:500, prize:'+$200', money:200, bonusXP:50},
+    {lvl:3, xp:1200, prize:'+$300', money:300, bonusXP:75},
+    {lvl:4, xp:2000, prize:'+$500', money:500, bonusXP:100},
+    {lvl:5, xp:3000, prize:'⭐ +$800 + 150 XP', money:800, bonusXP:150},
+    {lvl:6, xp:4200, prize:'+$400', money:400, bonusXP:80},
+    {lvl:7, xp:5500, prize:'+$600', money:600, bonusXP:100},
+    {lvl:8, xp:7000, prize:'+$1,000', money:1000, bonusXP:120},
+    {lvl:9, xp:8800, prize:'+$700', money:700, bonusXP:100},
+    {lvl:10, xp:11000, prize:'🏆 +$2,000 + 300 XP', money:2000, bonusXP:300},
+    {lvl:11, xp:13500, prize:'+$800', money:800, bonusXP:120},
+    {lvl:12, xp:16000, prize:'+$1,200', money:1200, bonusXP:150},
+    {lvl:13, xp:19000, prize:'+$1,000', money:1000, bonusXP:130},
+    {lvl:14, xp:22500, prize:'+$1,500', money:1500, bonusXP:180},
+    {lvl:15, xp:26500, prize:'💎 +$3,000 + 500 XP', money:3000, bonusXP:500},
+    {lvl:16, xp:31000, prize:'+$1,200', money:1200, bonusXP:150},
+    {lvl:17, xp:36000, prize:'+$2,000', money:2000, bonusXP:200},
+    {lvl:18, xp:42000, prize:'+$2,500', money:2500, bonusXP:250},
+    {lvl:19, xp:49000, prize:'+$3,000', money:3000, bonusXP:300},
+    {lvl:20, xp:57000, prize:'👑 ДЖЕКПОТ +$10,000 + 1000 XP', money:10000, bonusXP:1000}
+  ],
+
+  getTotalXP() {
+    // Total XP earned across all levels
+    let total = 0;
+    for (let i = 1; i < GS.level; i++) total += i * 500;
+    total += GS.xp;
+    return total;
+  },
+
+  getPassLevel() {
+    const total = this.getTotalXP();
+    for (let i = this.rewards.length - 1; i >= 0; i--) {
+      if (total >= this.rewards[i].xp) return i + 1;
+    }
+    return 1;
+  },
+
+  claimReward(lvl) {
+    const idx = lvl - 1;
+    if (idx < 0 || idx >= this.rewards.length) return;
+    const r = this.rewards[idx];
+    const totalXP = this.getTotalXP();
+    if (totalXP < r.xp) { toast('Недостаточно XP для этого уровня', 'warning'); return; }
+
+    // Check if already claimed
+    if (!GS.passClaimed) GS.passClaimed = {};
+    if (GS.passClaimed[lvl]) { toast('Награда уже получена!', 'warning'); return; }
+
+    GS.passClaimed[lvl] = true;
+    GS.balance += r.money;
+    GS.addTx(r.money, `Casino Pass Ур.${lvl}`);
+    GS.showBalChange(r.money);
+    if (r.bonusXP > 0) GS.addXP(r.bonusXP);
+    GS.ui(); GS.save();
+    SFX.play(r.money >= 2000 ? 'bigwin' : 'win');
+    if (r.money >= 2000) confetti();
+    toast(`🎫 Casino Pass Ур.${lvl}: +$${fmt(r.money)}!`, 'success');
+    this.render();
+  },
+
+  render() {
+    const c = $('pass-body');
+    if (!c) return;
+    const totalXP = this.getTotalXP();
+    const passLvl = this.getPassLevel();
+    if (!GS.passClaimed) GS.passClaimed = {};
+
+    c.innerHTML = `<div class="info-box mb-12 text-center">
+      <div class="text-gold font-bold">Ваш уровень пропуска: ${passLvl} / 20</div>
+      <div class="text-sm text-gray">Общий XP: ${fmt(totalXP)}</div>
+    </div>` + this.rewards.map(r => {
+      const unlocked = totalXP >= r.xp;
+      const claimed = !!GS.passClaimed[r.lvl];
+      const isCurrent = r.lvl === passLvl;
+      return `<div class="info-box" style="margin-bottom:6px;opacity:${unlocked?1:0.4};border-left:3px solid ${claimed?'var(--green)':unlocked?'var(--gold)':'var(--gray-dark)'};${isCurrent?'background:rgba(245,158,11,0.06);':''}">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
+          <div>
+            <span class="font-bold text-sm">Ур. ${r.lvl}</span>
+            <span class="text-sm text-gray" style="margin-left:8px;">${r.prize}</span>
+            <span class="text-sm text-gray" style="margin-left:8px;">(${fmt(r.xp)} XP)</span>
+          </div>
+          <div>
+            ${claimed ? '<span class="text-green text-sm font-bold">✅ Получено</span>' :
+              unlocked ? `<button class="btn btn-gold btn-sm" onclick="CasinoPass.claimReward(${r.lvl})">Забрать</button>` :
+              '<span class="text-gray text-sm">🔒</span>'}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
   }
 };
 
