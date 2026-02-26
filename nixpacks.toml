@@ -5,4 +5,4 @@ nixPkgs = ["nodejs_18"]
 cmds = ["npm install"]
 
 [start]
-cmd = "node server.js"
+cmd = "node --max-old-space-size=256 --expose-gc server.js"
